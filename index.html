@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input id="shearchMovie" placeholder="Name" />
+    <img
+      src="https://thumbs.gfycat.com/SeparateFeistyGoa-size_restricted.gif"
+      id="preload"
+      style="display: none"
+    />
+  </body>
+</html>
+<script>
+  let preloadWindow = document.querySelector("#preload");
+  let input = document.querySelector("#shearchMovie");
+  input.addEventListener("keypress", function (event) {
+    search(event);
+  });
+  let q;
+  function search(event) {
+    if (event.key == "Enter") {
+      q = input.value;
+      let fetchpromisses = new Promise(function (resolved, rejected) {
+        let count = 0;
+        let id = setInterval(function () {
+          if (count == 3) {
+            preloadWindow.style.display = "none";
+            clearInterval(id);
+            let result = fetchMovie(q);
+            result.then(function (value) {
+              console.log(value + "hello");
+              if (value) {
+                resolved();
+              } else {
+                rejected();
+              }
+            });
+          } else {
+            count++;
+            preloadWindow.style.display = "block";
+          }
+        }, 1000);
+      });
+      fetchpromisses
+        .then(function () {
+          display(q);
+        })
+        .catch(function () {
+          console.log("bad");
+        });
+    }
+  }
+  let data;
+  async function fetchMovie(q) {
+    let url = `http://www.omdbapi.com/?t=${q}&apikey=28adf0fa`;
+    try {
+      let res = await fetch(url);
+      data = await res.json();
+      let x = Object.values(data)[0];
+
+      if (x == "False") {
+        // console.log(x);
+        return false;
+      } else {
+        return true;
+      }
+    } catch {
+      console.log("error");
+    }
+  }
+
+  function display(q) {}
+</script>
